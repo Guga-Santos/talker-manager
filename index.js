@@ -83,7 +83,6 @@ talkAuth,
 talkRateAuth,
 talkWatchedAtAuth,
 rescue(async (req, res) => {
-
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const { id } = req.params;
 
@@ -104,7 +103,7 @@ rescue(async (req, res) => {
   const { id } = req.params;
   const talker = await getTalker(); 
   const newJSON = talker.filter((ele) => ele.id !== Number(id));
-  
+
   await setTalker(newJSON);
 
   res.send(204);
