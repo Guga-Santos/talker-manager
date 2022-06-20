@@ -2,6 +2,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const rescue = require('express-rescue');
 const fs = require('fs').promises;
+const auth = require('./auth');
+
+const {
+  emailAuth,
+  passwordAuth,
+  nameAuth,
+  ageAuth,
+  talkAuth,
+  talkRateAuth,
+  talkWatchedAtAuth,
+  token,
+} = auth;
 
 const app = express();
 app.use(bodyParser.json());
@@ -45,43 +57,7 @@ app.get('/talker', rescue(async (_req, res) => {
   res.status(200).json(talker);
 }));
 
-// Auths - Req 04
-
-const emailAuth = (req, res, next) => {
-  const { email } = req.body;
-  const validEmail = /^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/.test(email);
-  if (!email || email === '') { 
-    return res.status(400).json({ message: 'O campo "email" é obrigatório' });
-  }
-  if (!validEmail) {
-    return res.status(400).json({ message: 'O "email" deve ter o formato "email@email.com"' });
-  }
-  next();
-  // https://www.w3resource.com/javascript/form/email-validation.php
-};
-
-const passwordAuth = (req, res, next) => {
-  const { password } = req.body;
-  if (!password || password === '') { 
-    return res.status(400).json({ message: 'O campo "password" é obrigatório' });
-  }
-  if (password.length < 6) { 
-    return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
-  }
-  next();
-};
-
-const token = () => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 16; i += 1) {
-    result += characters[Math.floor(Math.random() 
-    * characters.length)];
- }
- return result;
-};
-
-// Req 03
+// Req 03 e 04
 app.post('/login', emailAuth, passwordAuth, (_req, res) => {
   res.status(200).json({ token: token() });
 });
