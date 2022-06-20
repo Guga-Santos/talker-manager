@@ -27,10 +27,6 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-app.listen(PORT, () => {
-  console.log('Online');
-});
-
 // Req 02
 app.get('/talker/:id', rescue(async (req, res) => {
   const getTalker = () => fs.readFile('./talker.json', 'utf-8')
@@ -116,3 +112,29 @@ rescue(async (req, res) => {
   await setTalker(talker);
   res.status(200).json(updated);
 }));
+
+// Req 07
+
+app.delete('/talker/:id',
+tokenAuth,
+rescue(async (req, res) => {
+  const { id } = req.params;
+
+  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
+  .then((obj) => JSON.parse(obj))
+  .catch((_err) => []); 
+
+  const talker = await getTalker(); 
+
+  const newJSON = talker.filter((ele) => ele.id !== Number(id));
+
+  const setTalker = (data) => fs.writeFile('./talker.json', JSON.stringify(data));
+
+  await setTalker(newJSON);
+
+  res.send(204);
+}));
+
+app.listen(PORT, () => {
+  console.log('Online');
+});
