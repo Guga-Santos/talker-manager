@@ -1,8 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const rescue = require('express-rescue');
-const fs = require('fs').promises;
+const utilities = require('./FsUtilities');
 const auth = require('./auth');
+
+const { getTalker, setTalker } = utilities;
 
 const {
   emailAuth,
@@ -29,10 +31,6 @@ app.get('/', (_request, response) => {
 
 // Req 02
 app.get('/talker/:id', rescue(async (req, res) => {
-  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
-  .then((content) => JSON.parse(content))
-  .catch((_err) => []);
-
   const { id } = req.params;
   const talker = await getTalker();
 
@@ -46,10 +44,6 @@ app.get('/talker/:id', rescue(async (req, res) => {
 // Req 01
 
 app.get('/talker', rescue(async (_req, res) => {
-  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
-  .then((el) => JSON.parse(el))
-  .catch((_err) => []); 
-
   const talker = await getTalker();
   res.status(200).json(talker);
 }));
@@ -71,15 +65,9 @@ app.post('/talker',
   rescue(async (req, res) => {
     const { name, age, talk: { watchedAt, rate } } = req.body;
 
-    const getTalker = () => fs.readFile('./talker.json', 'utf-8')
-    .then((ele) => JSON.parse(ele))
-    .catch((_err) => []); 
-
     const talker = await getTalker();
     const newOne = { id: talker.length + 1, name, age, talk: { watchedAt, rate } };
     const talkerJSON = [...talker, newOne];
-
-    const setTalker = (data) => fs.writeFile('./talker.json', JSON.stringify(data));
 
     await setTalker(talkerJSON);
     res.status(201).json(newOne);
@@ -98,16 +86,11 @@ rescue(async (req, res) => {
 
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const { id } = req.params;
-  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
-  .then((elem) => JSON.parse(elem))
-  .catch((_err) => []); 
 
   const talker = await getTalker(); 
 
   const updated = { id: Number(id), name, age, talk: { watchedAt, rate } };
   talker[Number(id)] = updated;
-
-  const setTalker = (data) => fs.writeFile('./talker.json', JSON.stringify(data));
 
   await setTalker(talker);
   res.status(200).json(updated);
@@ -119,17 +102,9 @@ app.delete('/talker/:id',
 tokenAuth,
 rescue(async (req, res) => {
   const { id } = req.params;
-
-  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
-  .then((obj) => JSON.parse(obj))
-  .catch((_err) => []); 
-
   const talker = await getTalker(); 
-
   const newJSON = talker.filter((ele) => ele.id !== Number(id));
-
-  const setTalker = (data) => fs.writeFile('./talker.json', JSON.stringify(data));
-
+  
   await setTalker(newJSON);
 
   res.send(204);
