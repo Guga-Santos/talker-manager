@@ -38,14 +38,14 @@ app.get('/talker/:id', rescue(async (req, res) => {
 
 app.get('/talker', rescue(async (_req, res) => {
   const getTalker = () => fs.readFile('./talker.json', 'utf-8')
-  .then((content) => JSON.parse(content))
+  .then((el) => JSON.parse(el))
   .catch((_err) => []); 
 
   const talker = await getTalker();
   res.status(200).json(talker);
 }));
 
-// Auths
+// Auths - Req 04
 
 const emailAuth = (req, res, next) => {
   const { email } = req.body;
@@ -85,6 +85,3 @@ const token = () => {
 app.post('/login', emailAuth, passwordAuth, (_req, res) => {
   res.status(200).json({ token: token() });
 });
-
-// Req 04
-
