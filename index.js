@@ -83,10 +83,36 @@ app.post('/talker',
     const newOne = { id: talker.length + 1, name, age, talk: { watchedAt, rate } };
     const talkerJSON = [...talker, newOne];
 
-    const setTalker = (data) => {
-      return fs.writeFile('./talker.json', JSON.stringify(data));
-    };
+    const setTalker = (data) => fs.writeFile('./talker.json', JSON.stringify(data));
 
     await setTalker(talkerJSON);
     res.status(201).json(newOne);
+}));
+
+// Req 06
+
+app.put('/talker/:id',
+tokenAuth,
+nameAuth,
+ageAuth,
+talkAuth,
+talkRateAuth,
+talkWatchedAtAuth,
+rescue(async (req, res) => {
+
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const { id } = req.params;
+  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
+  .then((elem) => JSON.parse(elem))
+  .catch((_err) => []); 
+
+  const talker = await getTalker(); 
+
+  const updated = { id: Number(id), name, age, talk: { watchedAt, rate } };
+  talker[Number(id)] = updated;
+
+  const setTalker = (data) => fs.writeFile('./talker.json', JSON.stringify(data));
+
+  await setTalker(talker);
+  res.status(200).json(updated);
 }));
