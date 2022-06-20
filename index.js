@@ -12,6 +12,7 @@ const {
   talkAuth,
   talkRateAuth,
   talkWatchedAtAuth,
+  tokenAuth,
   token,
 } = auth;
 
@@ -61,3 +62,31 @@ app.get('/talker', rescue(async (_req, res) => {
 app.post('/login', emailAuth, passwordAuth, (_req, res) => {
   res.status(200).json({ token: token() });
 });
+
+// Req 05
+
+app.post('/talker',
+  tokenAuth,
+  nameAuth,
+  ageAuth,
+  talkAuth,
+  talkRateAuth,
+  talkWatchedAtAuth,
+  rescue(async (req, res) => {
+    const { name, age, talk: { watchedAt, rate } } = req.body;
+
+    const getTalker = () => fs.readFile('./talker.json', 'utf-8')
+    .then((ele) => JSON.parse(ele))
+    .catch((_err) => []); 
+
+    const talker = await getTalker();
+    const newOne = { id: talker.length + 1, name, age, talk: { watchedAt, rate } };
+    const talkerJSON = [...talker, newOne];
+
+    const setTalker = (data) => {
+      return fs.writeFile('./talker.json', JSON.stringify(data));
+    };
+
+    await setTalker(talkerJSON);
+    res.status(201).json(newOne);
+}));

@@ -1,4 +1,3 @@
-
 const emailAuth = (req, res, next) => {
     const { email } = req.body;
     const validEmail = /^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/.test(email);
@@ -50,7 +49,7 @@ const emailAuth = (req, res, next) => {
     if (!talk || talk === undefined) {
       return (
         res.status(400).json(
-          { message: 'O campo "talk" é obrigatório'},
+          { message: 'O campo "talk" é obrigatório' },
         )
       );
     }
@@ -87,6 +86,18 @@ const emailAuth = (req, res, next) => {
                 .json({ message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"' });
     }
     next();
+    // https://stackoverflow.com/questions/15491894/regex-to-validate-date-formats-dd-mm-yyyy-dd-mm-yyyy-dd-mm-yyyy-dd-mmm-yyyy
+  };
+
+  const tokenAuth = (req, res, next) => {
+    const token = req.headers.authorization;
+    if (!token || token === '') {
+      return res.status(401).json({ message: 'Token não encontrado' });
+    } 
+    if (token.length !== 16) {
+      return res.status(401).json({ message: 'Token inválido' });
+    }
+    next();
   };
   
   const token = () => {
@@ -107,5 +118,6 @@ const emailAuth = (req, res, next) => {
     talkAuth,
     talkRateAuth,
     talkWatchedAtAuth,
+    tokenAuth,
     token,
   };
