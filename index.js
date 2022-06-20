@@ -45,4 +45,39 @@ app.get('/talker', rescue(async (_req, res) => {
   res.status(200).json(talker);
 }));
 
-// 
+// Req 03
+
+const emailAuth = (req, res, next) => {
+  const { email } = req.body;
+  const validEmail = /^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+  if (!email || email === '' || !validEmail) { 
+    return res.status(400).json({ message: 'fail' });
+  }
+  next();
+  // https://www.w3resource.com/javascript/form/email-validation.php
+};
+
+const passwordAuth = (req, res, next) => {
+  const { password } = req.body;
+  if (!password || password === '') { 
+    return res.status(400).json({ message: 'fail' });
+  }
+  if (password.length < 6) { 
+    return res.status(400).json({ message: 'fail' });
+  }
+  next();
+};
+
+const token = () => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 16; i += 1) {
+    result += characters[Math.floor(Math.random() 
+    * characters.length)];
+ }
+ return result;
+};
+
+app.post('/login', emailAuth, passwordAuth, (_req, res) => {
+  res.status(200).json({ token: token() });
+});
