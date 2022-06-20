@@ -29,6 +29,19 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+// Req 08
+app.get('/talker/search',
+tokenAuth,
+rescue(async (req, res) => {
+  const query = req.query.q;
+  const talker = await getTalker();
+  const filtered = talker.filter((obj) => obj.name.includes(query));
+
+  if (!query || query === '') return res.status(200).json(talker);
+
+  res.status(200).json(filtered);
+}));
+
 // Req 02
 app.get('/talker/:id', rescue(async (req, res) => {
   const { id } = req.params;
