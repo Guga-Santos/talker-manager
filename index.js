@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const rescue = require('express-rescue');
+const fs = require('fs').promises;
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,3 +17,12 @@ app.get('/', (_request, response) => {
 app.listen(PORT, () => {
   console.log('Online');
 });
+
+app.get('/talker', rescue(async (_req, res) => {
+  const getTalker = () => fs.readFile('./talker.json', 'utf-8')
+  .then((content) => JSON.parse(content))
+  .catch((_err) => []); 
+
+  const talker = await getTalker();
+  res.status(200).json(talker);
+}));
