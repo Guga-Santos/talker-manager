@@ -125,3 +125,5 @@ rescue(async (req, res) => {
 app.listen(PORT, () => {
   console.log('Online');
 });
+
+// console.log(crypto.randomBytes(8).toString('hex'));
